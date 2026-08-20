@@ -83,7 +83,6 @@ has 'dealer' => (
 
 sub _build_dealer {
   my $self = shift;
-  # Reuse the eval engine's dealer so deck state stays shared
   return $self->eval_engine->dealer;
 }
 
@@ -105,7 +104,6 @@ has 'pending_draws' => (
 
 sub BUILD {
   my $self = shift;
-  # Keep eval engine wired to the same scorer and board
   $self->eval_engine->scorer( $self->scorer )
     unless $self->eval_engine->scorer;
   $self->eval_engine->community_cards( $self->board );
@@ -141,8 +139,7 @@ sub deal_hole {
 
     my $cards = $game->deal_cards(['As', 'Kd']);
 
-Deal specific cards from the deck (alias-friendly name for the old
-C<deal_named> concept).
+Deal specific cards from the deck.
 
 =cut
 
@@ -164,8 +161,12 @@ sub board_string {
 
 =head2 flop / turn / river
 
-Deal the next street. Pass an array ref of card names for a specific
-board, or omit for random cards from the remaining deck.
+Deal the next street. Pass card name(s) for a specific board, or omit
+for random cards from the remaining deck.
+
+    $game->flop(['Ah','7c','2d']);
+    $game->turn('9s');       # single card name OK
+    $game->river(['3c']);    # or one-element array
 
 =cut
 
@@ -189,12 +190,23 @@ sub river {
   return $self->_deal_street( 1, $cards );
 }
 
+sub _normalize_cards {
+  my ( $self, $count, $specific ) = @_;
+  return undef unless defined $specific;
+  if ( ref $specific eq 'ARRAY' ) {
+    return $specific;
+  }
+  # Single card name string (common for turn/river)
+  return [$specific];
+}
+
 sub _deal_street {
   my ( $self, $count, $specific ) = @_;
+  my $cards = $self->_normalize_cards( $count, $specific );
   my $new;
-  if ( ref $specific eq 'ARRAY' ) {
-    die "expected $count cards" unless @$specific == $count;
-    $new = $self->deal_cards($specific);
+  if ($cards) {
+    die "expected $count cards" unless @$cards == $count;
+    $new = $self->deal_cards($cards);
   }
   else {
     $new = $self->dealer->deal($count);
@@ -230,9 +242,10 @@ sub runout {
   my ( $self, $specific ) = @_;
   die "runout not legal in current state" unless $self->can_runout;
   my $need = $self->board_size - @{ $self->board };
-  if ( ref $specific eq 'ARRAY' ) {
-    die "expected $need cards" unless @$specific == $need;
-    push @{ $self->board }, @{ $self->deal_cards($specific) };
+  my $cards = $self->_normalize_cards( $need, $specific );
+  if ($cards) {
+    die "expected $need cards" unless @$cards == $need;
+    push @{ $self->board }, @{ $self->deal_cards($cards) };
   }
   else {
     push @{ $self->board }, @{ $self->dealer->deal($need) };
@@ -288,10 +301,9 @@ sub equity {
   $engine->community_remaining(
     $self->board_size - @{ $self->board }
   );
-  $engine->hole_remaining(0);  # hole cards already dealt
+  $engine->hole_remaining(0);
   $engine->simulations( $self->iterations );
 
-  # Reset win counters
   for my $h (@$hands) {
     $h->wins(0);
     $h->ev(0);
@@ -301,7 +313,6 @@ sub equity {
   return $hands;
 }
 
-# Backward-compatible alias
 sub calc_ev { shift->equity(@_) }
 
 =head2 reset
