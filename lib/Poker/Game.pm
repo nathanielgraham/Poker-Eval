@@ -110,6 +110,14 @@ sub BUILD {
   $self->dealer->shuffle_deck;
 }
 
+sub _assert_no_pending_actions {
+  my $self = shift;
+  die "cannot deal board while discards are pending"
+    if $self->pending_discards;
+  die "cannot deal board while draws are pending"
+    if $self->pending_draws;
+}
+
 =head1 METHODS
 
 =head2 deal_hole
@@ -168,6 +176,9 @@ for random cards from the remaining deck.
     $game->turn('9s');       # single card name OK
     $game->river(['3c']);    # or one-element array
 
+C<turn> and C<river> die if discards or draws are still pending
+(e.g. after a Crazy Pineapple flop).
+
 =cut
 
 sub flop {
@@ -178,6 +189,7 @@ sub flop {
 
 sub turn {
   my ( $self, $cards ) = @_;
+  $self->_assert_no_pending_actions;
   die "turn requires exactly 3 board cards"
     unless @{ $self->board } == 3;
   return $self->_deal_street( 1, $cards );
@@ -185,6 +197,7 @@ sub turn {
 
 sub river {
   my ( $self, $cards ) = @_;
+  $self->_assert_no_pending_actions;
   die "river requires exactly 4 board cards"
     unless @{ $self->board } == 4;
   return $self->_deal_street( 1, $cards );
@@ -196,7 +209,6 @@ sub _normalize_cards {
   if ( ref $specific eq 'ARRAY' ) {
     return $specific;
   }
-  # Single card name string (common for turn/river)
   return [$specific];
 }
 
