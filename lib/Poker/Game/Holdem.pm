@@ -57,18 +57,20 @@ extends 'Poker::Game';
 has '+hole_count' => ( default => sub { 2 } );
 has '+board_size' => ( default => sub { 5 } );
 
-has '+scorer' => (
-  default => sub { Poker::Score::High->new },
-);
+# Build scorer and eval_engine before calling the parent constructor
+# so required attributes are always defined.
+around BUILDARGS => sub {
+  my ( $orig, $class, @args ) = @_;
+  my $args = $class->$orig(@args);
+  $args = {} unless ref $args eq 'HASH';
 
-has '+eval_engine' => (
-  default => sub {
-    my $self = shift;
-    Poker::Eval::Community->new(
-      scorer => $self->scorer,
-    );
-  },
-);
+  $args->{scorer} //= Poker::Score::High->new;
+  $args->{eval_engine} //= Poker::Eval::Community->new(
+    scorer => $args->{scorer},
+  );
+
+  return $args;
+};
 
 =head1 AUTHOR
 
