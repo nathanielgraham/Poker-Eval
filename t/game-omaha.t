@@ -36,12 +36,13 @@ use Poker::Game::OmahaHiLo;
   like( $hero->name, qr/Two Pair/i, 'Omaha two pair Aces and Kings' );
 }
 
-# --- Omaha Hi-Lo: nut low qualifies ---
+# --- Omaha Hi-Lo: nut-ish low qualifies ---
+# Omaha low needs exactly 2 hole + 3 board, all ranks ≤ 8, unpaired.
+# Hole A-2 + board 4-5-6 → A-2-4-5-6 qualifies.
 {
   my $game = Poker::Game::OmahaHiLo->new;
   my $hero = $game->deal_hole( ['As', '2d', '3c', 'Kd'] );
-  # Board has A-2-3-4-5 ingredients for a wheel low
-  $game->flop( ['4h', '5c', '9s'] );
+  $game->flop( ['4h', '5c', '6s'] );
   $game->turn('Jh');
   $game->river('Kc');
   $game->evaluate($hero);
