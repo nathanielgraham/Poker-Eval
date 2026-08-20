@@ -19,26 +19,17 @@ use Poker::Game::CrazyPineapple;
   like( $hero->name, qr/Two Pair/i, 'Pineapple two pair' );
 }
 
-# --- Crazy Pineapple: discard required before runout ---
+# --- Crazy Pineapple: discard required before turn/runout ---
 {
   my $game = Poker::Game::CrazyPineapple->new;
   my $hero = $game->deal_hole( ['As', 'Kd', '7c'] );
-
   $game->flop( ['Ah', 'Kc', '2d'] );
+
   ok( $game->pending_discards, 'pending discard after flop' );
   ok( !$game->can_runout,      'runout blocked until discard' );
 
   eval { $game->turn('9s') };
-  # turn itself does not check pending_discards; runout does.
-  # Re-reset board state for clean discard test:
-}
-
-{
-  my $game = Poker::Game::CrazyPineapple->new;
-  my $hero = $game->deal_hole( ['As', 'Kd', '7c'] );
-  $game->flop( ['Ah', 'Kc', '2d'] );
-
-  ok( !$game->can_runout, 'can_runout false while discard pending' );
+  ok( $@, 'turn dies while discard pending' );
 
   $game->discard( $hero, '7c' );
   is( scalar @{ $hero->cards }, 2, '2 hole cards after discard' );
