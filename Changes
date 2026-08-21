@@ -1,11 +1,19 @@
 Revision history for Poker-Eval
 
 0.10    2026-08-20
-        - Add Poker::Game named-variant API (Holdem, Omaha, draw, stud, Badugi, …)
+        - Add Poker::Game named-variant API:
+            Community: Holdem, HoldemJokersWild, Pineapple, CrazyPineapple,
+                       Omaha, OmahaHiLo, Omaha5, Omaha5HiLo,
+                       Courcheval, CourchevalHiLo
+            Draw:      FiveCardDraw, Deuces/Jokers wild, 2-7 and A-5 draw
+            Stud:      SevenCardStud, SevenCardStudHiLo, Razz
+            Badugi:    Badugi, Badacey, Badeucy
         - Only Poker::Eval defines $VERSION (cleaner CPAN index)
-        - Joker support via Poker::Deck / Poker::Dealer joker_count
-        - Equity and street helpers on the Game layer
-        - Expanded test suite
+        - Joker support via Poker::Deck/Dealer joker_count
+        - Fix equity: tied hands split the pot (1/N each), not full wins
+        - Document equity, core methods, and AA-vs-KK example in README
+          and Poker::Game POD
+        - Expanded automated tests
 
 0.09    2016
         - Prior CPAN release
