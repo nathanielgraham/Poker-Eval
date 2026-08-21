@@ -15,7 +15,7 @@ Poker::Game::OmahaHiLo - Omaha Hold'em high/low 8-or-better
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

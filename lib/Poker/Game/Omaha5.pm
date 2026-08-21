@@ -12,7 +12,7 @@ Poker::Game::Omaha5 - Five-card Omaha (high only)
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

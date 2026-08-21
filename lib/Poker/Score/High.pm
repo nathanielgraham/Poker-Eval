@@ -11,7 +11,7 @@ Poker::Score::High - Identify and score specific highball poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

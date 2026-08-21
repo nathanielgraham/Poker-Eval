@@ -13,7 +13,7 @@ Poker::Game::Stud - Base class for stud-style games
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

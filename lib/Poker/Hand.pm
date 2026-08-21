@@ -10,7 +10,7 @@ Poker::Hand - Simple class to represent a poker hand.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

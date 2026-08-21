@@ -14,7 +14,7 @@ Poker::Game::SevenCardStud - Seven-card stud (high)
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

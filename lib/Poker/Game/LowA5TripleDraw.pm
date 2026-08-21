@@ -14,7 +14,7 @@ Poker::Game::LowA5TripleDraw - A-5 triple draw
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

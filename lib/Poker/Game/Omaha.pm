@@ -14,7 +14,7 @@ Poker::Game::Omaha - Omaha Hold'em (high only)
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

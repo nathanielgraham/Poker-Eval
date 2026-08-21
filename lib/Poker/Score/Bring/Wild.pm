@@ -12,7 +12,7 @@ Poker::Score::Bring::Wild - Scoring system used in highball Stud with wildcards 
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

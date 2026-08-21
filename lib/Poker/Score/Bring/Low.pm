@@ -12,7 +12,7 @@ Poker::Score::Bring::Low - Scoring system used in lowball Stud to decide which p
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

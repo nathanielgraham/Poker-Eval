@@ -14,7 +14,7 @@ Poker::Game::Razz - Razz (seven-card stud low A-5)
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

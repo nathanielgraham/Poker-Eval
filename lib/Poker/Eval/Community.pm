@@ -11,7 +11,7 @@ Poker::Eval::Community - Evaluate and score hand using any combination of hole a
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

@@ -14,7 +14,7 @@ Poker::Game::Holdem - Texas Hold'em
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

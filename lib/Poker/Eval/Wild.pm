@@ -11,7 +11,7 @@ Poker::Eval::Wild - Evaluate and score wildcard poker hands.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

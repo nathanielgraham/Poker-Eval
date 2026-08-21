@@ -10,7 +10,7 @@ Poker::Eval::Badugi27 - Evaluate and score Badeucy poker hands.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

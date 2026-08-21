@@ -11,7 +11,7 @@ Poker::Score::Low8 - Identify and score lowball 8 or better poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

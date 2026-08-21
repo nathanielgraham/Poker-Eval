@@ -11,7 +11,7 @@ Poker::Eval::Omaha - Evaluate and score Omaha poker hands.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

@@ -12,7 +12,7 @@ Poker::Eval::Badugi - Evaluate and score Badugi poker hands.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

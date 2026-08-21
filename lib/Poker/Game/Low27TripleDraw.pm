@@ -14,7 +14,7 @@ Poker::Game::Low27TripleDraw - 2-7 triple draw
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

@@ -10,7 +10,7 @@ Poker::Eval::BlackMariah - Evaluate and score hole cards in the game of Black Ma
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

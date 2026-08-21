@@ -14,7 +14,7 @@ Poker::Game::CrazyPineapple - Crazy Pineapple
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

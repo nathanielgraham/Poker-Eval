@@ -14,7 +14,7 @@ Poker::Game::FiveCardDrawDeucesWild - Five-card draw, deuces wild
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

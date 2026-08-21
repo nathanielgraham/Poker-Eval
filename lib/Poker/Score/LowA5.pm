@@ -11,7 +11,7 @@ Poker::Score::LowA5 - Identify and score lowball A-5 poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

@@ -14,7 +14,7 @@ Poker::Game::LowA5SingleDraw - A-5 single draw
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
