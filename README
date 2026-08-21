@@ -20,7 +20,7 @@ SYNOPSIS
     $game->river('3c');
     $game->evaluate($hero);
     say $hero->name;              # Two Pair
-    say $hero->score;             # numerical strength (higher is better)
+    say $hero->score;             # numerical strength
     say $hero->best_combo_flat;   # e.g. AsAhKdKc9s
 
     # Estimate preflop equity (Monte Carlo)
@@ -31,7 +31,14 @@ SYNOPSIS
     $game->equity([ $aa, $kk ]);
     say "Hero    AA: ", $aa->ev, "%";
     say "Villain KK: ", $kk->ev, "%";
-    # Typical result: AA ~80%, KK ~20%
+    # Typical result: AA ~82%, KK ~18%
+
+
+CARD NAMES
+
+    Rank:  2 3 4 5 6 7 8 9 T J Q K A
+    Suit:  c d h s     (e.g. As, Td, 2c)
+    Jokers: Jo1, Jo2   (when using a joker deck)
 
 
 WHAT IS EQUITY?
@@ -43,9 +50,9 @@ Each simulation awards 1.0 pot unit total:
   - sole winner receives 1.0
   - N tied winners each receive 1/N
 
-Results are a percentage of simulations (ev values across hands sum
-to about 100). Known hole cards and any fixed board cards are dead
-and never re-dealt.
+Results are a percentage of simulations, rounded to the nearest integer
+(ev values across hands sum to about 100). Known hole cards and any
+fixed board cards are dead and never re-dealt.
 
     $game->iterations(5000);
     $game->equity([ $hero, $villain ]);
@@ -60,13 +67,20 @@ CORE METHODS (Poker::Game)
     evaluate        Best hand under this game's rules; sets score, name
     equity          Monte Carlo win share; sets hand->ev (alias: calc_ev)
     discard / draw  Draw-game discard and refill
+                    (Crazy Pineapple: discard one hole card after the flop)
     reset           New shuffled deck; clear board and draw state
+
+Stud games add street helpers (see Poker::Game::Stud):
+    third_street .. seventh_street, deal_to
 
 After evaluate, read the result from the hand:
 
     $hand->name             # e.g. "Two Pair"
-    $hand->score            # numerical score (higher is better for highball)
+    $hand->score            # numerical score for this ranking system
+                            # (higher is better within that system)
     $hand->best_combo_flat  # cards used in the best five
+    $hand->low_name         # hi-lo games only, if low qualifies
+    $hand->low_score        # hi-lo games only, if low qualifies
 
 See: perldoc Poker::Game
 
@@ -104,6 +118,8 @@ Poker::Score::* ranking systems directly.
 
 Only Poker::Eval defines $VERSION for the distribution so CPAN indexes
 a single package.
+
+Requires: Moo, Algorithm::Combinatorics, Tie::IxHash, List::Util, Storable
 
 
 INSTALLATION
