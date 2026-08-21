@@ -1,4 +1,7 @@
 package Poker::Game::Courcheval;
+our $VERSION = '0.12';
+
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -9,7 +12,7 @@ Poker::Game::Courcheval - Courchevel (5-card Omaha high)
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 

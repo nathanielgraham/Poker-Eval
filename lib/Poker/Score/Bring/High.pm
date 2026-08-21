@@ -1,4 +1,7 @@
 package Poker::Score::Bring::High;
+our $VERSION = '0.12';
+
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 use List::Util qw(max);
@@ -9,7 +12,7 @@ Poker::Score::Bring::High - Scoring system used in highball Stud to decide which
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 

@@ -1,4 +1,7 @@
 package Poker::Game::Low27SingleDraw;
+our $VERSION = '0.12';
+
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -11,7 +14,7 @@ Poker::Game::Low27SingleDraw - 2-7 single draw
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 

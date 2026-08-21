@@ -1,4 +1,7 @@
 package Poker::Game::Stud;
+our $VERSION = '0.12';
+
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -10,7 +13,7 @@ Poker::Game::Stud - Base class for stud-style games
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 

@@ -1,4 +1,7 @@
 package Poker::Score::Low27;
+our $VERSION = '0.12';
+
+
 use Moo;
 
 =head1 NAME
@@ -7,7 +10,7 @@ Poker::Score::Low27 - Identify and score lowball 2-7 poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 

@@ -1,4 +1,7 @@
 package Poker::Game::Badeucy;
+our $VERSION = '0.12';
+
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -13,7 +16,7 @@ Poker::Game::Badeucy - Badeucy (Badugi27 + 2-7 low split)
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 

@@ -1,4 +1,7 @@
 package Poker::Eval::BlackMariah;
+our $VERSION = '0.12';
+
+
 use Moo;
 
 =head1 NAME
@@ -7,7 +10,7 @@ Poker::Eval::BlackMariah - Evaluate and score hole cards in the game of Black Ma
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 

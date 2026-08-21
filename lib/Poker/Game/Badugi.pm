@@ -1,4 +1,7 @@
 package Poker::Game::Badugi;
+our $VERSION = '0.12';
+
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -11,7 +14,7 @@ Poker::Game::Badugi - Badugi
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 

@@ -1,4 +1,7 @@
 package Poker::Score::Badugi27;
+our $VERSION = '0.12';
+
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 
@@ -8,7 +11,7 @@ Poker::Score::Badugi27 - Scoring system used in the game of Badeucy.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 

@@ -1,4 +1,7 @@
 package Poker::Score::High;
+our $VERSION = '0.12';
+
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 
@@ -8,7 +11,7 @@ Poker::Score::High - Identify and score specific highball poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 

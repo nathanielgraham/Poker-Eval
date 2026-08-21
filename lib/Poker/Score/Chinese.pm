@@ -1,4 +1,7 @@
 package Poker::Score::Chinese;
+our $VERSION = '0.12';
+
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 
@@ -8,7 +11,7 @@ Poker::Score::Chinese - Identify and score Chinese poker hand.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 

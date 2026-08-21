@@ -1,4 +1,7 @@
 package Poker::Score;
+our $VERSION = '0.12';
+
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -9,7 +12,7 @@ Poker::Score - Identify and score specific poker hands. Base class for specific 
 
 =head1 VERSION
 
-Version 0.09
+Version 0.12
 
 =cut
 
@@ -178,7 +181,7 @@ sub BUILD {
 
 =head1 SEE ALSO
 
-Poker::Score::High, Poker::Score::Low8, Poker::Score::Low27, Poker::Score::LowA5, Poker::Score::Badugi, Poker::Score::Badugi27, Poker::Score::Chinese, Poker::Score::HighSuit, Poker::Score::Bring::High, Poker::Score::Bring::Low, Poker::Score::Bring::Wild
+Poker::Score::High, Poker::Score::Low8, Poker::Score::Low27, Poker::Score::LowA5, Poker::Score::Badugi, Poker::Score::Badugi27, Poker::Score::HighSuit, Poker::Score::Bring::High, Poker::Score::Bring::Low, Poker::Score::Bring::Wild
 
 =head1 AUTHOR
 

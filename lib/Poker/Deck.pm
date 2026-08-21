@@ -1,4 +1,7 @@
 package Poker::Deck;
+our $VERSION = '0.12';
+
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
@@ -11,7 +14,7 @@ Poker::Deck - Simple class to represent a deck of poker cards.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 
