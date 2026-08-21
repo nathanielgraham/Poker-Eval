@@ -12,34 +12,33 @@ Poker::Dealer - Simple class to represent a poker dealer
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
-
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
     use Poker::Dealer;
 
     my $dealer = Poker::Dealer->new;
+    my $dealer = Poker::Dealer->new( joker_count => 2 );
 
     $dealer->shuffle_deck;
-
-    # Returns an array_ref of face-up card objects
     my $cards = $dealer->deal_up(4);
-
-    # Returns an array_ref of face-down card objects
-    my $cards = $dealer->deal_down(5);
-
-    # Deal yourself two aces:
     my $cards = $dealer->deal_named(['As', 'Ah']);
+    my $joker = $dealer->deal_named(['Jo1']);
 
 =cut
 
 has 'id' => (
   is  => 'rw',
+);
+
+has 'joker_count' => (
+  is      => 'ro',
+  default => sub { 0 },
 );
 
 has 'master_deck' => (
@@ -49,7 +48,8 @@ has 'master_deck' => (
 );
 
 sub _build_master_deck {
-  return Poker::Deck->new;
+  my $self = shift;
+  return Poker::Deck->new( joker_count => $self->joker_count );
 }
 
 has 'deck' => (
@@ -68,8 +68,6 @@ sub shuffle_cards {
   my ( $self, $cards ) = @_;
   $cards->cards->Reorder( shuffle $cards->cards->Keys );
 }
-
-=head1 SUBROUTINES/METHODS
 
 =head2 shuffle_deck
 
@@ -98,16 +96,17 @@ Shuffles cards in the discard pile and adds them to the existing deck.
 sub reshuffle {
   my $self = shift;
   while (my $card = shift @{ $self->deck->discards }) {
-    $self->deck->cards->Push( $card->rank . $card->suit => $card )
+    my $key = $card->rank eq 'Joker'
+      ? 'Jo' . $card->suit
+      : $card->rank . $card->suit;
+    $self->deck->cards->Push( $key => $card );
   }
   $self->shuffle_cards( $self->deck );
 }
 
 =head2 deal_down
 
-Returns an array_ref of Poker::Card objects face down 
 =cut
-
 
 sub deal_down {
   my ($self, $count)  = @_;
@@ -116,7 +115,6 @@ sub deal_down {
 
 =head2 deal_up
 
-Returns an array_ref of Poker::Card objects face up 
 =cut
 
 sub deal_up {
@@ -148,12 +146,6 @@ Nathaniel Graham, C<< <ngraham at cpan.org> >>
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2016 Nathaniel Graham.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
 
 =cut
 
