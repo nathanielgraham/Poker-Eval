@@ -53,6 +53,8 @@ Makefile.PL
 MANIFEST
 README
 t/00-load.t
+t/equity-reference.t
+t/equity-ties.t
 t/game-badugi.t
 t/game-fivecard.t
 t/game-holdem.t
