@@ -20,7 +20,7 @@ our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
-Preferred interface — named games:
+Preferred interface -- named games:
 
     use Poker::Game::Holdem;
     use feature qw(say);
@@ -43,7 +43,7 @@ Preferred interface — named games:
     $game->equity([ $hero, $villain ]);
     say $hero->ev;
 
-Advanced — compose rules and scoring yourself:
+Advanced -- compose rules and scoring yourself:
 
     use Poker::Eval::Omaha;
     use Poker::Score::High;
@@ -61,7 +61,7 @@ C<Poker::Eval> and C<Poker::Score> engines.
 
 C<Poker::Eval> remains the rules engine base class (how hole and
 community cards combine). C<Poker::Score> defines ranking systems
-(highball, lowball, Badugi, …).
+(highball, lowball, Badugi, ...).
 
 Only this module defines C<$VERSION> for the distribution; other
 packages intentionally omit it so PAUSE indexes a single release.

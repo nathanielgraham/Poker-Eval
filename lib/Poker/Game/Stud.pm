@@ -23,11 +23,11 @@ best five are scored via the eval engine.
 
 Street helpers enforce typical seven-card stud structure:
 
-    third_street  — deal 3 (start)
-    fourth_street — deal 1 (hand size 4)
-    fifth_street  — deal 1 (hand size 5)
-    sixth_street  — deal 1 (hand size 6)
-    seventh_street / river — deal 1 (hand size 7)
+    third_street  -- deal 3 (start)
+    fourth_street -- deal 1 (hand size 4)
+    fifth_street  -- deal 1 (hand size 5)
+    sixth_street  -- deal 1 (hand size 6)
+    seventh_street / river -- deal 1 (hand size 7)
 
 =cut
 

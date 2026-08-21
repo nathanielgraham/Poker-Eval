@@ -20,7 +20,7 @@ Version 0.10
 
 =head1 DESCRIPTION
 
-Badacey: five hole cards, triple draw. Split between Badugi (best 1–4
+Badacey: five hole cards, triple draw. Split between Badugi (best 1-4
 card badugi from the five) and A-5 five-card low.
 
 C<evaluate> sets high-side Badugi on C<score>/C<name>/C<best_combo> and
