@@ -12,7 +12,6 @@ Version 0.09
 
 =cut
 
-our $VERSION = '0.09';
 
 
 =head1 INTRODUCTION

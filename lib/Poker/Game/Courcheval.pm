@@ -13,7 +13,6 @@ Version 0.10
 
 =cut
 
-our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -22,7 +21,7 @@ our $VERSION = '0.10';
     my $game = Poker::Game::Courcheval->new;
     my $hero = $game->deal_hole(['As','Kd','7c','2h','9s']);
     $game->door('Ah');           # first board card (preflop)
-    $game->flop(['Kc','2d']);    # two more → 3 board cards
+    $game->flop(['Kc','2d']);    # two more -> 3 board cards
     $game->turn('9c');
     $game->river('3s');
     $game->evaluate($hero);

@@ -15,7 +15,6 @@ Version 0.10
 
 =cut
 
-our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -33,7 +32,7 @@ our $VERSION = '0.10';
 Pineapple: three hole cards, five community cards. Any combination of
 hole and community cards may be used (same as Hold'em). Players typically
 discard down to two hole cards before the flop in live play; this module
-models the card math only — discard timing is left to the caller (or use
+models the card math only -- discard timing is left to the caller (or use
 C<Poker::Game::CrazyPineapple> for post-flop discard).
 
 =cut

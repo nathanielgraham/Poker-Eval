@@ -15,7 +15,6 @@ Version 0.10
 
 =cut
 
-our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
