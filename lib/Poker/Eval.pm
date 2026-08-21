@@ -174,6 +174,10 @@ sub deal_named {
 Monte-Carlo expected win rate for an array ref of hands. Prefer
 C<Poker::Game>'s C<equity> method for the named-game API.
 
+Each simulation awards 1.0 pot unit total. If N hands tie for the best
+score, each receives C<1/N>. Equity is reported as a percentage of
+simulations (so the C<ev> values across hands sum to approximately 100).
+
 =cut
 
 sub calc_ev {
@@ -193,19 +197,19 @@ sub calc_ev {
       $hand->temp_score( $best_hand->score );
     }
 
-    my @scores =
-      map { $_->temp_score } sort { $a->temp_score <=> $b->temp_score } @$hands;
-    my $top_score = pop @scores;
+    my $top_score = 0;
     for my $hand (@$hands) {
-      $hand->wins( $hand->wins + 1 ) if $hand->temp_score == $top_score;
+      $top_score = $hand->temp_score if $hand->temp_score > $top_score;
+    }
+    my @winners = grep { $_->temp_score == $top_score } @$hands;
+    my $share   = 1 / scalar @winners;
+    for my $hand (@winners) {
+      $hand->wins( $hand->wins + $share );
     }
   }
-  my $total_wins = 0;
+  my $sims = $self->simulations || 1;
   for my $hand (@$hands) {
-    $total_wins += $hand->wins;
-  }
-  for my $hand (@$hands) {
-    $hand->ev( int( $hand->wins / $total_wins * 100 ) );
+    $hand->ev( int( $hand->wins / $sims * 100 + 0.5 ) );  # round nearest
   }
 }
 
