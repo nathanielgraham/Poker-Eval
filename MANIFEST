@@ -66,3 +66,4 @@ t/game-stud.t
 t/manifest.t
 t/pod.t
 t/score.t
+t/equity-continue.t
