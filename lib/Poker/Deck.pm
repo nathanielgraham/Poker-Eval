@@ -31,20 +31,6 @@ has 'joker_count' => (
   default => sub { 0 },
 );
 
-has 'cards' => (
-  is => 'rw',
-  isa =>
-    sub { die "Not a Tie::IxHash!" unless $_[0]->isa( 'Tie::IxHash') },
-  builder => '_build_cards',
-);
-
-has 'discards' => (
-  is => 'rw',
-  isa =>
-    sub { die "Not an array!" unless ref($_[0]) eq 'ARRAY' },
-  default => sub { [] },
-);
-
 has 'card_type' => (
   is      => 'rw',
   builder => '_build_card_type',
@@ -53,6 +39,19 @@ has 'card_type' => (
 sub _build_card_type {
   return 'Poker::Card';
 }
+
+has 'cards' => (
+  is      => 'rw',
+  lazy    => 1,
+  isa     => sub { die "Not a Tie::IxHash!" unless $_[0]->isa('Tie::IxHash') },
+  builder => '_build_cards',
+);
+
+has 'discards' => (
+  is      => 'rw',
+  isa     => sub { die "Not an array!" unless ref( $_[0] ) eq 'ARRAY' },
+  default => sub { [] },
+);
 
 sub _build_cards {
   my $self  = shift;
@@ -69,7 +68,8 @@ sub _build_cards {
       );
     }
   }
-  for my $i ( 1 .. $self->joker_count ) {
+  my $jokers = $self->joker_count // 0;
+  for my $i ( 1 .. $jokers ) {
     my $name = "Jo$i";
     $cards->Push(
       $name => $self->card_type->new(
