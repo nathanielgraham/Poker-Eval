@@ -1,4 +1,6 @@
 package Poker::Score::Chinese;
+
+our $VERSION = '0.11';
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 

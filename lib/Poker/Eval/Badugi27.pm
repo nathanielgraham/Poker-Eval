@@ -1,4 +1,6 @@
 package Poker::Eval::Badugi27;
+
+our $VERSION = '0.11';
 use Moo;
 
 =head1 NAME

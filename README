@@ -1,6 +1,6 @@
 Poker-Eval
 
-VERSION 0.10
+VERSION 0.11
 
 Deal, score, and estimate equity for many poker variants through a named
 Poker::Game API (Hold'em, Omaha, draw, stud, Badugi, and more).

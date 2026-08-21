@@ -1,4 +1,6 @@
 package Poker::Score::Badugi27;
+
+our $VERSION = '0.11';
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 

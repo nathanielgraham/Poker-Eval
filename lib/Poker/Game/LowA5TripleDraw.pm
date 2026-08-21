@@ -1,4 +1,6 @@
 package Poker::Game::LowA5TripleDraw;
+
+our $VERSION = '0.11';
 use strict;
 use warnings FATAL => 'all';
 use Moo;
