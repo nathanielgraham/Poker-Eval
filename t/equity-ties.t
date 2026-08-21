@@ -7,11 +7,10 @@ use Poker::Game::Holdem;
 {
   my $game = Poker::Game::Holdem->new( iterations => 200 );
   my $h1 = $game->deal_hole( [ 'As', 'Kd' ] );
-  my $h2 = $game->deal_hole( [ 'Ad', 'Kh' ] );  # same ranks, different suits
+  my $h2 = $game->deal_hole( [ 'Ad', 'Kh' ] );
   $game->flop( [ '2c', '7d', '9h' ] );
   $game->turn('3s');
   $game->river('8c');
-  # Board is dry; both have AK high -- pure chop every time
   $game->equity( [ $h1, $h2 ] );
 
   is( $h1->ev + $h2->ev, 100, 'chop equities sum to 100' );
@@ -38,17 +37,41 @@ use Poker::Game::Holdem;
 }
 
 # AA vs KK preflop: AA should be well ahead, sum ~100
+# Residual deck must not re-deal As/Ad/Ks/Kd
 {
-  my $game = Poker::Game::Holdem->new( iterations => 500 );
+  my $game = Poker::Game::Holdem->new( iterations => 800 );
   my $aa = $game->deal_hole( [ 'As', 'Ad' ] );
   my $kk = $game->deal_hole( [ 'Ks', 'Kd' ] );
   $game->equity( [ $aa, $kk ] );
 
   ok( $aa->ev + $kk->ev >= 99 && $aa->ev + $kk->ev <= 101,
     'AA vs KK sum ~100' );
-  ok( $aa->ev > 70, 'AA equity > 70% vs KK' );
-  ok( $kk->ev < 30, 'KK equity < 30% vs AA' );
+  ok( $aa->ev > 75, 'AA equity > 75% vs KK (dead cards respected)' );
+  ok( $kk->ev < 25, 'KK equity < 25% vs AA' );
   ok( $aa->ev > $kk->ev, 'AA > KK' );
+}
+
+# Flop already out: remaining deck excludes hole + flop cards
+{
+  my $game = Poker::Game::Holdem->new( iterations => 400 );
+  my $aa = $game->deal_hole( [ 'As', 'Ad' ] );
+  my $qq = $game->deal_hole( [ 'Qs', 'Qd' ] );
+  $game->flop( [ 'Ah', '7c', '2d' ] );  # AA has a set
+  $game->equity( [ $aa, $qq ] );
+  ok( $aa->ev > 90, 'AA set vs QQ on A72 is heavily favored' );
+  ok( $aa->ev + $qq->ev >= 99 && $aa->ev + $qq->ev <= 101, 'sum ~100' );
+}
+
+# Numerical score is set by evaluate
+{
+  my $game = Poker::Game::Holdem->new;
+  my $hero = $game->deal_hole( [ 'As', 'Kd' ] );
+  $game->flop( [ 'Ah', 'Kc', '2d' ] );
+  $game->turn('9s');
+  $game->river('3c');
+  $game->evaluate($hero);
+  ok( $hero->score > 0, 'evaluate sets numerical score' );
+  ok( $hero->name,      'evaluate sets name' );
 }
 
 done_testing();
