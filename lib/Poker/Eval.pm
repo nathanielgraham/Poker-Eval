@@ -170,13 +170,6 @@ sub deal_named {
   return $self->dealer->deal_named($cards);
 }
 
-sub _card_key {
-  my ( $self, $card ) = @_;
-  return $card->rank eq 'Joker'
-    ? ( 'Jo' . $card->suit )
-    : ( $card->rank . $card->suit );
-}
-
 =head2 calc_ev
 
 Monte-Carlo expected win rate for an array ref of hands. Prefer
@@ -186,9 +179,9 @@ Each simulation awards 1.0 pot unit total. If N hands tie for the best
 score, each receives C<1/N>. Equity is reported as a percentage of
 simulations (so the C<ev> values across hands sum to approximately 100).
 
-Known hole cards and the current board are treated as dead: each run
-shuffles only the B<remaining> deck, then deals C<community_remaining>
-(and C<hole_remaining> if set) from that residual pack.
+The dealer's current deck (already missing dealt hole and board cards)
+is cloned once; each simulation re-clones and shuffles that residual
+pack, then deals C<community_remaining> / C<hole_remaining> from it.
 
 =cut
 
@@ -196,28 +189,12 @@ sub calc_ev {
   my ( $self, $hands ) = @_;
   my $community_orig = dclone( $self->community_cards );
 
-  # Dead cards: all known hole cards + fixed board
-  my %dead;
-  for my $hand (@$hands) {
-    for my $card ( @{ $hand->cards } ) {
-      $dead{ $self->_card_key($card) } = 1;
-    }
-  }
-  for my $card (@$community_orig) {
-    $dead{ $self->_card_key($card) } = 1;
-  }
-
-  # Residual deck template: master pack minus dead cards
-  my $residual = dclone( $self->dealer->master_deck );
-  for my $key ( keys %dead ) {
-    $residual->cards->Delete($key) if $residual->cards->EXISTS($key);
-  }
+  # Snapshot undealt cards (hole + board already removed via deal_*)
+  my $residual = dclone( $self->dealer->deck );
 
   for ( 1 .. $self->simulations ) {
-    # Fresh residual deck each sim, then shuffle
-    my $deck = dclone($residual);
-    $self->dealer->deck($deck);
-    $self->dealer->shuffle_cards($deck);
+    $self->dealer->deck( dclone($residual) );
+    $self->dealer->shuffle_cards( $self->dealer->deck );
 
     if ( $self->community_remaining ) {
       $self->community_cards(
@@ -247,7 +224,6 @@ sub calc_ev {
     }
   }
 
-  # Restore fixed board on the engine
   $self->community_cards($community_orig);
 
   my $sims = $self->simulations || 1;
