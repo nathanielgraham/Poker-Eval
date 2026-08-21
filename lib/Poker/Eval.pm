@@ -35,6 +35,7 @@ Preferred interface -- named games:
 
     $game->evaluate($hero);
     say $hero->name;          # Two Pair
+    say $hero->score;         # numerical strength
     say $hero->best_combo_flat;
 
     $game->reset;
@@ -169,6 +170,13 @@ sub deal_named {
   return $self->dealer->deal_named($cards);
 }
 
+sub _card_key {
+  my ( $self, $card ) = @_;
+  return $card->rank eq 'Joker'
+    ? ( 'Jo' . $card->suit )
+    : ( $card->rank . $card->suit );
+}
+
 =head2 calc_ev
 
 Monte-Carlo expected win rate for an array ref of hands. Prefer
@@ -178,21 +186,52 @@ Each simulation awards 1.0 pot unit total. If N hands tie for the best
 score, each receives C<1/N>. Equity is reported as a percentage of
 simulations (so the C<ev> values across hands sum to approximately 100).
 
+Known hole cards and the current board are treated as dead: each run
+shuffles only the B<remaining> deck, then deals C<community_remaining>
+(and C<hole_remaining> if set) from that residual pack.
+
 =cut
 
 sub calc_ev {
   my ( $self, $hands ) = @_;
   my $community_orig = dclone( $self->community_cards );
+
+  # Dead cards: all known hole cards + fixed board
+  my %dead;
+  for my $hand (@$hands) {
+    for my $card ( @{ $hand->cards } ) {
+      $dead{ $self->_card_key($card) } = 1;
+    }
+  }
+  for my $card (@$community_orig) {
+    $dead{ $self->_card_key($card) } = 1;
+  }
+
+  # Residual deck template: master pack minus dead cards
+  my $residual = dclone( $self->dealer->master_deck );
+  for my $key ( keys %dead ) {
+    $residual->cards->Delete($key) if $residual->cards->EXISTS($key);
+  }
+
   for ( 1 .. $self->simulations ) {
-    $self->dealer->shuffle_deck;
+    # Fresh residual deck each sim, then shuffle
+    my $deck = dclone($residual);
+    $self->dealer->deck($deck);
+    $self->dealer->shuffle_cards($deck);
+
     if ( $self->community_remaining ) {
       $self->community_cards(
         [ @$community_orig, @{ $self->deal( $self->community_remaining ) } ] );
     }
-    for my $hand (@$hands) {
-      my $combo =
-        [ @{ $hand->cards }, @{ $self->deal( $self->hole_remaining ) } ];
+    else {
+      $self->community_cards( [@$community_orig] );
+    }
 
+    for my $hand (@$hands) {
+      my $combo = [ @{ $hand->cards } ];
+      if ( $self->hole_remaining ) {
+        push @$combo, @{ $self->deal( $self->hole_remaining ) };
+      }
       my $best_hand = $self->best_hand($combo);
       $hand->temp_score( $best_hand->score );
     }
@@ -207,9 +246,13 @@ sub calc_ev {
       $hand->wins( $hand->wins + $share );
     }
   }
+
+  # Restore fixed board on the engine
+  $self->community_cards($community_orig);
+
   my $sims = $self->simulations || 1;
   for my $hand (@$hands) {
-    $hand->ev( int( $hand->wins / $sims * 100 + 0.5 ) );  # round nearest
+    $hand->ev( int( $hand->wins / $sims * 100 + 0.5 ) );
   }
 }
 
