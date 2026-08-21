@@ -2,6 +2,7 @@ package Poker::Game::Stud;
 use strict;
 use warnings FATAL => 'all';
 use Moo;
+use Poker::Hand;
 
 =head1 NAME
 
@@ -112,7 +113,6 @@ sub seventh_street {
   return $self->deal_to( $hand, 1, $specific );
 }
 
-# Alias used by some players
 sub river { shift->seventh_street(@_) }
 
 =head2 deal_hole
