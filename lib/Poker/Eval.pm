@@ -35,6 +35,7 @@ Preferred interface -- named games:
 
     $game->evaluate($hero);
     say $hero->name;          # Two Pair
+    say $hero->score;         # numerical strength
     say $hero->best_combo_flat;
 
     $game->reset;
@@ -178,21 +179,36 @@ Each simulation awards 1.0 pot unit total. If N hands tie for the best
 score, each receives C<1/N>. Equity is reported as a percentage of
 simulations (so the C<ev> values across hands sum to approximately 100).
 
+The dealer's current deck (already missing dealt hole and board cards)
+is cloned once; each simulation re-clones and shuffles that residual
+pack, then deals C<community_remaining> / C<hole_remaining> from it.
+
 =cut
 
 sub calc_ev {
   my ( $self, $hands ) = @_;
   my $community_orig = dclone( $self->community_cards );
+
+  # Snapshot undealt cards (hole + board already removed via deal_*)
+  my $residual = dclone( $self->dealer->deck );
+
   for ( 1 .. $self->simulations ) {
-    $self->dealer->shuffle_deck;
+    $self->dealer->deck( dclone($residual) );
+    $self->dealer->shuffle_cards( $self->dealer->deck );
+
     if ( $self->community_remaining ) {
       $self->community_cards(
         [ @$community_orig, @{ $self->deal( $self->community_remaining ) } ] );
     }
-    for my $hand (@$hands) {
-      my $combo =
-        [ @{ $hand->cards }, @{ $self->deal( $self->hole_remaining ) } ];
+    else {
+      $self->community_cards( [@$community_orig] );
+    }
 
+    for my $hand (@$hands) {
+      my $combo = [ @{ $hand->cards } ];
+      if ( $self->hole_remaining ) {
+        push @$combo, @{ $self->deal( $self->hole_remaining ) };
+      }
       my $best_hand = $self->best_hand($combo);
       $hand->temp_score( $best_hand->score );
     }
@@ -207,9 +223,12 @@ sub calc_ev {
       $hand->wins( $hand->wins + $share );
     }
   }
+
+  $self->community_cards($community_orig);
+
   my $sims = $self->simulations || 1;
   for my $hand (@$hands) {
-    $hand->ev( int( $hand->wins / $sims * 100 + 0.5 ) );  # round nearest
+    $hand->ev( int( $hand->wins / $sims * 100 + 0.5 ) );
   }
 }
 
