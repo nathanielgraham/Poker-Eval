@@ -1,4 +1,14 @@
 Revision history for Poker-Eval
 
-0.01    January 3, 2016 
+0.10    2026-08-20
+        - Add Poker::Game named-variant API (Holdem, Omaha, draw, stud, Badugi, …)
+        - Only Poker::Eval defines $VERSION (cleaner CPAN index)
+        - Joker support via Poker::Deck / Poker::Dealer joker_count
+        - Equity and street helpers on the Game layer
+        - Expanded test suite
 
+0.09    2016
+        - Prior CPAN release
+
+0.01    January 3, 2016
+        - Initial release
