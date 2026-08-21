@@ -9,28 +9,94 @@ use Poker::Hand;
 
 Poker::Game - Base class for named poker variants
 
-=head1 VERSION
-
-Version 0.10
-
-=cut
-
-
 =head1 SYNOPSIS
 
     use Poker::Game::Holdem;
-    my $game = Poker::Game::Holdem->new;
+    use feature qw(say);
 
+    my $game = Poker::Game::Holdem->new( iterations => 2000 );
+
+    # Made hand on a full board
     my $hero = $game->deal_hole(['As', 'Kd']);
     $game->flop(['Ah', '7c', '2d']);
+    $game->turn('9s');
+    $game->river('3c');
     $game->evaluate($hero);
-    say $hero->name;
+    say $hero->name;               # e.g. Two Pair
+    say $hero->best_combo_flat;
+
+    # Preflop equity
+    $game->reset;
+    my $aa = $game->deal_hole(['As', 'Ad']);
+    my $kk = $game->deal_hole(['Ks', 'Kd']);
+    $game->equity([ $aa, $kk ]);
+    say "AA: ", $aa->ev, "%";
+    say "KK: ", $kk->ev, "%";
 
 =head1 DESCRIPTION
 
 C<Poker::Game> is the product-facing layer over C<Poker::Eval> and
-C<Poker::Score>. Subclasses wire hole/board counts and the correct
-eval/score engines for a specific variant.
+C<Poker::Score>. Concrete subclasses (C<Poker::Game::Holdem>,
+C<Poker::Game::Omaha>, ...) set hole/board counts and wire the correct
+eval and scoring engines.
+
+Prefer a named subclass over constructing C<Poker::Game> directly.
+
+=head1 EQUITY
+
+B<Equity> is the estimated share of the pot a hand wins if the remaining
+board (or draws) is completed many times at random.
+
+Each simulation awards B<1.0> pot unit in total:
+
+=over 4
+
+=item * Sole winner: that hand receives 1.0
+
+=item * N hands tied for best: each receives 1/N
+
+=back
+
+C<< $hand->ev >> is that share as a percentage of simulations (so the
+C<ev> values across the hands in a call sum to about 100). Sample size
+is controlled by C<iterations> (default 1000).
+
+    $game->iterations(5000);
+    $game->equity([ $hero, $villain ]);
+
+C<calc_ev> is a backward-compatible alias for C<equity>.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item hole_count
+
+How many hole cards each player is dealt (set by the subclass).
+
+=item board_size
+
+Number of community cards (0 for draw/stud/Badugi).
+
+=item iterations
+
+Monte Carlo sample size for C<equity> (default 1000).
+
+=item max_draw_rounds / draws_left
+
+Draw-game discard rounds allowed / remaining.
+
+=back
+
+=head1 METHODS
+
+=head2 deal_hole
+
+    my $hand = $game->deal_hole;              # random hole_count cards
+    my $hand = $game->deal_hole(2);           # random N cards
+    my $hand = $game->deal_hole(['As','Kd']); # specific cards
+
+Returns a C<Poker::Hand>.
 
 =cut
 
@@ -49,7 +115,6 @@ has 'iterations' => (
   default => sub { 1000 },
 );
 
-# Max discard/draw rounds (1 for single-draw, 3 for triple-draw)
 has 'max_draw_rounds' => (
   is      => 'ro',
   default => sub { 0 },
@@ -125,15 +190,6 @@ sub _assert_no_pending_actions {
     if $self->pending_draws;
 }
 
-=head1 METHODS
-
-=head2 deal_hole
-
-    my $hand = $game->deal_hole;
-    my $hand = $game->deal_hole(['As','Kd']);
-
-=cut
-
 sub deal_hole {
   my ( $self, $arg ) = @_;
   my $cards;
@@ -149,7 +205,9 @@ sub deal_hole {
 
 =head2 deal_cards
 
-Deal specific cards from the deck.
+    my $cards = $game->deal_cards(['As', 'Kd']);
+
+Remove specific cards from the deck by name. Jokers are C<Jo1>, C<Jo2>, ...
 
 =cut
 
@@ -160,6 +218,8 @@ sub deal_cards {
 
 =head2 board_string
 
+Community cards as a flat string (e.g. C<Ah7c2d>).
+
 =cut
 
 sub board_string {
@@ -168,6 +228,13 @@ sub board_string {
 }
 
 =head2 flop / turn / river
+
+    $game->flop(['Ah','7c','2d']);  # or random if omitted
+    $game->turn('9s');
+    $game->river('3c');
+
+Deal the next community street. C<turn> and C<river> die if discards or
+draws are still pending.
 
 =cut
 
@@ -220,6 +287,9 @@ sub _deal_street {
 
 =head2 can_runout
 
+True when the game uses community cards, the board is incomplete, and no
+discards/draws are pending.
+
 =cut
 
 sub can_runout {
@@ -232,6 +302,11 @@ sub can_runout {
 }
 
 =head2 runout
+
+    $game->runout;                    # random remaining board
+    $game->runout(['9s','3c']);       # specific cards
+
+Deal all remaining community cards. Dies unless C<can_runout> is true.
 
 =cut
 
@@ -256,8 +331,8 @@ sub runout {
     $game->discard($hand, '7c');
     $game->discard($hand, ['7c', '2h']);
 
-Remove one or more hole cards. Sets C<pending_draws> so C<draw> is required
-before the next round (for draw games).
+Remove one or more hole cards. For draw games, sets C<pending_draws>
+so C<draw> is expected next.
 
 =cut
 
@@ -294,7 +369,7 @@ sub discard {
 
 =head2 draw
 
-    $game->draw($hand);             # random refill to hole_count
+    $game->draw($hand);              # random refill to hole_count
     $game->draw($hand, ['As','Kd']); # specific replacements
 
 Replace discarded cards up to C<hole_count>. Decrements C<draws_left>.
@@ -328,6 +403,12 @@ sub draw {
 
 =head2 evaluate
 
+    $game->evaluate($hand);
+    my $result = $game->evaluate(['As','Kd']);  # or raw card list
+
+Score the best hand under this game's rules. On a C<Poker::Hand>, sets
+C<score>, C<name>, and C<best_combo> (and low-side fields for hi-lo games).
+
 =cut
 
 sub evaluate {
@@ -350,6 +431,11 @@ sub evaluate {
 }
 
 =head2 equity
+
+    $game->equity([ $hand1, $hand2, ... ]);
+
+Monte Carlo equity from the current board state. Sets C<< $hand->ev >>
+on each hand (see L</EQUITY>). Alias: C<calc_ev>.
 
 =cut
 
@@ -381,6 +467,8 @@ sub calc_ev { shift->equity(@_) }
 
 =head2 reset
 
+Shuffle a fresh deck; clear board and draw/discard state.
+
 =cut
 
 sub reset {
@@ -393,6 +481,10 @@ sub reset {
   $self->dealer->shuffle_deck;
   return $self;
 }
+
+=head1 SEE ALSO
+
+L<Poker::Game::Holdem>, L<Poker::Eval>, L<Poker::Score>, L<Poker::Hand>
 
 =head1 AUTHOR
 
