@@ -1,6 +1,7 @@
 package Poker::Score::LowA5;
 
 our $VERSION = '0.11';
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 

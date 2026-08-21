@@ -1,6 +1,7 @@
 package Poker::Hand;
 
 our $VERSION = '0.11';
+
 use Moo;
 
 =head1 NAME

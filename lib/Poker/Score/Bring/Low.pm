@@ -1,6 +1,7 @@
 package Poker::Score::Bring::Low;
 
 our $VERSION = '0.11';
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations);
 use List::Util qw(max);

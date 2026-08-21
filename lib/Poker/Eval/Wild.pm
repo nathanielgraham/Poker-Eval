@@ -1,6 +1,7 @@
 package Poker::Eval::Wild;
 
 our $VERSION = '0.11';
+
 use Algorithm::Combinatorics qw(combinations combinations_with_repetition);
 use Moo;
 

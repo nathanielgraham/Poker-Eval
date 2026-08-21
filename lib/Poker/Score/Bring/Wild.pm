@@ -1,6 +1,7 @@
 package Poker::Score::Bring::Wild;
 
 our $VERSION = '0.11';
+
 use Moo;
 use Algorithm::Combinatorics qw(combinations combinations_with_repetition);
 use List::Util qw(max);

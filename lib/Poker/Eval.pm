@@ -1,4 +1,6 @@
 package Poker::Eval;
+
+our $VERSION = '0.11';
 use strict;
 use Moo;
 use Poker::Hand;
@@ -16,7 +18,6 @@ Poker::Eval - Deal, score, and evaluate poker hands
 
 =cut
 
-our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 

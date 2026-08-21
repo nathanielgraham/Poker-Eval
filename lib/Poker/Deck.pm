@@ -1,6 +1,7 @@
 package Poker::Deck;
 
 our $VERSION = '0.11';
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;

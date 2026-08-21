@@ -1,6 +1,7 @@
 package Poker::Game::SevenCardStud;
 
 our $VERSION = '0.11';
+
 use strict;
 use warnings FATAL => 'all';
 use Moo;
