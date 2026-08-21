@@ -2,37 +2,109 @@ Poker-Eval
 
 VERSION 0.10
 
-Deal, score, and evaluate poker hands for many variants via a named
+Deal, score, and estimate equity for many poker variants through a named
 Poker::Game API (Hold'em, Omaha, draw, stud, Badugi, and more).
+
 
 SYNOPSIS
 
     use Poker::Game::Holdem;
+    use feature qw(say);
 
     my $game = Poker::Game::Holdem->new;
+
+    # Evaluate a made hand on a full board
     my $hero = $game->deal_hole(['As', 'Kd']);
     $game->flop(['Ah', '7c', '2d']);
     $game->turn('9s');
     $game->river('3c');
     $game->evaluate($hero);
-    print $hero->name, "\n";
+    say $hero->name;              # Two Pair
+    say $hero->score;             # numerical strength (higher is better)
+    say $hero->best_combo_flat;   # e.g. AsAhKdKc9s
 
-NAMED GAMES (primary API)
+    # Estimate preflop equity (Monte Carlo)
+    $game->reset;
+    $game->iterations(2000);
+    my $aa = $game->deal_hole(['As', 'Ad']);
+    my $kk = $game->deal_hole(['Ks', 'Kd']);
+    $game->equity([ $aa, $kk ]);
+    say "Hero    AA: ", $aa->ev, "%";
+    say "Villain KK: ", $kk->ev, "%";
+    # Typical result: AA ~80%, KK ~20%
 
-    Community:  Holdem, HoldemJokersWild, Pineapple, CrazyPineapple,
-                Omaha, OmahaHiLo, Omaha5, Omaha5HiLo,
-                Courcheval, CourchevalHiLo
-    Draw:       FiveCardDraw, FiveCardDrawDeucesWild,
-                FiveCardDrawJokersWild,
-                Low27SingleDraw, Low27TripleDraw,
-                LowA5SingleDraw, LowA5TripleDraw
-    Stud:       SevenCardStud, SevenCardStudHiLo, Razz
-    Badugi:     Badugi, Badacey, Badeucy
+
+WHAT IS EQUITY?
+
+Equity is the estimated share of the pot a hand wins if the remaining
+board is completed many times at random from the undealt cards.
+
+Each simulation awards 1.0 pot unit total:
+  - sole winner receives 1.0
+  - N tied winners each receive 1/N
+
+Results are a percentage of simulations (ev values across hands sum
+to about 100). Known hole cards and any fixed board cards are dead
+and never re-dealt.
+
+    $game->iterations(5000);
+    $game->equity([ $hero, $villain ]);
+
+
+CORE METHODS (Poker::Game)
+
+    deal_hole       Random or specific hole cards; returns a Poker::Hand
+    deal_cards      Pull specific cards from the deck by name (e.g. 'As')
+    flop/turn/river Community board streets (Hold'em-style games)
+    runout          Deal all remaining board cards when legal
+    evaluate        Best hand under this game's rules; sets score, name
+    equity          Monte Carlo win share; sets hand->ev (alias: calc_ev)
+    discard / draw  Draw-game discard and refill
+    reset           New shuffled deck; clear board and draw state
+
+After evaluate, read the result from the hand:
+
+    $hand->name             # e.g. "Two Pair"
+    $hand->score            # numerical score (higher is better for highball)
+    $hand->best_combo_flat  # cards used in the best five
+
+See: perldoc Poker::Game
+
+
+NAMED GAMES
+
+    Community
+      Holdem              Texas Hold'em (high)
+      HoldemJokersWild    Hold'em with two jokers wild
+      Pineapple           Three hole cards
+      CrazyPineapple      Three hole; discard one after the flop
+      Omaha / OmahaHiLo   Four hole; exactly two hole + three board
+      Omaha5 / Omaha5HiLo Five-card Omaha
+      Courcheval          Five-card Omaha; board dealt 1+2+1+1
+      CourchevalHiLo      Courchevel high/low
+
+    Draw
+      FiveCardDraw                Highball single draw
+      FiveCardDrawDeucesWild      Deuces wild
+      FiveCardDrawJokersWild      Two jokers wild
+      Low27SingleDraw/TripleDraw  2-7 lowball
+      LowA5SingleDraw/TripleDraw  A-5 lowball
+
+    Stud
+      SevenCardStud / SevenCardStudHiLo
+      Razz                        Seven-card stud A-5 low
+
+    Badugi family
+      Badugi                      Four cards, triple draw
+      Badacey                     Badugi + A-5 low split
+      Badeucy                     Badugi (aces high) + 2-7 low split
 
 Advanced users can still compose Poker::Eval::* rules with
 Poker::Score::* ranking systems directly.
 
-Only Poker::Eval defines $VERSION for the distribution (cleaner CPAN index).
+Only Poker::Eval defines $VERSION for the distribution so CPAN indexes
+a single package.
+
 
 INSTALLATION
 
@@ -41,10 +113,18 @@ INSTALLATION
     make test
     make install
 
+
+CHANGE LOG
+
+See the Changes file in the distribution.
+
+
 SUPPORT AND DOCUMENTATION
 
     perldoc Poker::Eval
+    perldoc Poker::Game
     perldoc Poker::Game::Holdem
+
 
 LICENSE AND COPYRIGHT
 
