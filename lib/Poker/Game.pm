@@ -31,7 +31,7 @@ Poker::Game - Base class for named poker variants
     my $aa = $game->deal_hole(['As', 'Ad']);
     my $kk = $game->deal_hole(['Ks', 'Kd']);
     $game->equity([ $aa, $kk ]);
-    say "AA: ", $aa->ev, "%";
+    say "AA: ", $aa->ev, "%";     # integer percent, ~82
     say "KK: ", $kk->ev, "%";
 
 =head1 DESCRIPTION
@@ -42,6 +42,9 @@ C<Poker::Game::Omaha>, ...) set hole/board counts and wire the correct
 eval and scoring engines.
 
 Prefer a named subclass over constructing C<Poker::Game> directly.
+
+Card names use rank C<2..9TJQKA> plus suit C<c d h s> (e.g. C<As>, C<Td>).
+Jokers are C<Jo1>, C<Jo2> when the dealer was built with jokers.
 
 =head1 EQUITY
 
@@ -58,9 +61,9 @@ Each simulation awards B<1.0> pot unit in total:
 
 =back
 
-C<< $hand->ev >> is that share as a percentage of simulations (so the
-C<ev> values across the hands in a call sum to about 100). Sample size
-is controlled by C<iterations> (default 1000).
+C<< $hand->ev >> is that share as a B<rounded integer percentage> of
+simulations (so the C<ev> values across the hands in a call sum to about
+100). Sample size is controlled by C<iterations> (default 1000).
 
 Known hole cards and any fixed board cards are already removed from the
 dealer's deck; each simulation clones and shuffles that residual pack.
@@ -89,6 +92,12 @@ Monte Carlo sample size for C<equity> (default 1000).
 =item max_draw_rounds / draws_left
 
 Draw-game discard rounds allowed / remaining.
+
+=item pending_discards / pending_draws
+
+Phase flags. Crazy Pineapple sets C<pending_discards> after the flop
+until each player discards; draw games set C<pending_draws> after
+C<discard> until C<draw>.
 
 =back
 
@@ -240,7 +249,7 @@ sub board_string {
     $game->river('3c');
 
 Deal the next community street. C<turn> and C<river> die if discards or
-draws are still pending.
+draws are still pending (e.g. Crazy Pineapple before the mandatory discard).
 
 =cut
 
@@ -337,8 +346,14 @@ sub runout {
     $game->discard($hand, '7c');
     $game->discard($hand, ['7c', '2h']);
 
-Remove one or more hole cards. For draw games, sets C<pending_draws>
-so C<draw> is expected next.
+Remove one or more hole cards from C<$hand>.
+
+B<Draw games:> sets C<pending_draws> so C<draw> is expected next, and
+decrements toward C<max_draw_rounds>.
+
+B<Crazy Pineapple:> after the flop each player must discard exactly one
+hole card (clearing C<pending_discards>) before C<turn> / C<river> are
+allowed. That path does not use C<draw>.
 
 =cut
 
@@ -379,6 +394,7 @@ sub discard {
     $game->draw($hand, ['As','Kd']); # specific replacements
 
 Replace discarded cards up to C<hole_count>. Decrements C<draws_left>.
+Used by five-card draw and lowball draw games, not by Crazy Pineapple.
 
 =cut
 
@@ -412,9 +428,19 @@ sub draw {
     $game->evaluate($hand);
     my $result = $game->evaluate(['As','Kd']);  # or raw card list
 
-Score the best hand under this game's rules. On a C<Poker::Hand>, sets
-C<score> (numerical strength), C<name> (e.g. C<Two Pair>), and
-C<best_combo> (and low-side fields for hi-lo games).
+Score the best hand under this game's rules. On a C<Poker::Hand>, sets:
+
+=over 4
+
+=item * C<score> -- numerical strength for this ranking system (higher is better within that system)
+
+=item * C<name> -- English label (e.g. C<Two Pair>)
+
+=item * C<best_combo> -- cards used
+
+=item * C<low_score>, C<low_name>, C<low_combo> -- hi-lo games only, when the hand qualifies for low
+
+=back
 
 =cut
 
@@ -489,9 +515,17 @@ sub reset {
   return $self;
 }
 
+=head1 STUD GAMES
+
+Seven-card stud variants extend C<Poker::Game::Stud>, which adds
+C<third_street>, C<fourth_street>, C<fifth_street>, C<sixth_street>,
+C<seventh_street> (alias C<river>), and C<deal_to>. See
+L<Poker::Game::Stud>, L<Poker::Game::SevenCardStud>, L<Poker::Game::Razz>.
+
 =head1 SEE ALSO
 
-L<Poker::Game::Holdem>, L<Poker::Eval>, L<Poker::Score>, L<Poker::Hand>
+L<Poker::Game::Holdem>, L<Poker::Game::Stud>, L<Poker::Eval>,
+L<Poker::Score>, L<Poker::Hand>
 
 =head1 AUTHOR
 
